@@ -2,6 +2,7 @@ package io.codelex.flightplanner.controller;
 
 import io.codelex.flightplanner.domain.Flight;
 import io.codelex.flightplanner.request.AddFlightRequest;
+import io.codelex.flightplanner.service.FlightInMemoryService;
 import io.codelex.flightplanner.service.FlightService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

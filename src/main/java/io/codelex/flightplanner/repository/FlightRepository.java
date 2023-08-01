@@ -1,30 +1,26 @@
 package io.codelex.flightplanner.repository;
 
 import io.codelex.flightplanner.domain.Flight;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
 
-@Repository
-public class FlightRepository {
+public interface FlightRepository extends JpaRepository<Flight, Long> {
 
-    private final List<Flight> savedFlights = new ArrayList<>();
+    @Query("SELECT f FROM Flight f WHERE f.from.airport = :fromAirport " +
+            "AND f.to.airport = :toAirport " +
+            "AND f.carrier = :carrier " +
+            "AND f.departureTime = :departureTime " +
+            "AND f.arrivalTime = :arrivalTime ")
+    List<Flight> findFlightByCriteria(String fromAirport, String toAirport, String carrier, LocalDateTime departureTime, LocalDateTime arrivalTime);
 
-    public synchronized void saveFlight(Flight flight) {
-        savedFlights.add(flight);
-    }
-
-    public List<Flight> listFlights() {
-        return savedFlights;
-    }
-
-    public synchronized void deleteAllFlights() {
-        savedFlights.clear();
-    }
-
-    public synchronized void deleteFlight(long id) {
-        savedFlights.remove(savedFlights.stream().filter(flight1 -> flight1.getId() == id).findAny().orElse(null));
-    }
+    @Query("SELECT f FROM Flight f " +
+            "WHERE LOWER(f.from.airport) = LOWER(:from) " +
+            "AND LOWER(f.to.airport) = LOWER(:to) " +
+            "AND f.departureTime >= :departureStartTime " +
+            "AND f.departureTime <= :departureEndTime ")
+    List<Flight> searchFlight(String from, String to, LocalDateTime departureStartTime, LocalDateTime departureEndTime);
 
 }
