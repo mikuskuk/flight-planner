@@ -4,7 +4,7 @@ import io.codelex.flightplanner.controller.AdminFlightController;
 import io.codelex.flightplanner.controller.TestApiController;
 import io.codelex.flightplanner.domain.Airport;
 import io.codelex.flightplanner.domain.Flight;
-import io.codelex.flightplanner.repository.FlightRepository;
+import io.codelex.flightplanner.repository.FlightInMemoryRepository;
 import io.codelex.flightplanner.request.AddFlightRequest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -22,12 +22,12 @@ class FlightPlannerApplicationTests {
 	@Autowired
 	TestApiController testApiController;
 	@Autowired
-	FlightRepository flightRepository;
+    FlightInMemoryRepository flightInMemoryRepository;
 
 
 	@AfterEach
 	void clearData() {
-		flightRepository.deleteAllFlights();
+		flightInMemoryRepository.deleteAllFlights();
 	}
 
 	private final AddFlightRequest flightRequest = new AddFlightRequest(
@@ -55,7 +55,7 @@ class FlightPlannerApplicationTests {
 
 		testApiController.clear();
 
-		List<Flight> flights = flightRepository.listFlights();
+		List<Flight> flights = flightInMemoryRepository.listFlights();
 
 		Assertions.assertTrue(flights.isEmpty());
 	}

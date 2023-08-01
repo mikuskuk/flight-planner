@@ -2,7 +2,7 @@ package io.codelex.flightplanner.service;
 
 import io.codelex.flightplanner.domain.Airport;
 import io.codelex.flightplanner.domain.Flight;
-import io.codelex.flightplanner.repository.FlightRepository;
+import io.codelex.flightplanner.repository.FlightInMemoryRepository;
 import io.codelex.flightplanner.request.PageResult;
 import io.codelex.flightplanner.request.SearchFlightsRequest;
 import org.junit.jupiter.api.Assertions;
@@ -16,12 +16,12 @@ import java.util.Arrays;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
-class FlightServiceTest {
+class FlightInMemoryServiceTest {
 
     @Mock
-    private FlightRepository flightRepository;
+    private FlightInMemoryRepository flightInMemoryRepository;
     @InjectMocks
-    private FlightService flightService;
+    private FlightInMemoryService flightInMemoryService;
     private final Airport airportRix = new Airport("Latvia", "Riga", "RIX");
     private final Airport airportLgw = new Airport("UK", "London", "LGW");
     LocalDateTime departureTime = LocalDateTime.of(2023, 7, 12, 12, 0);
@@ -38,11 +38,11 @@ class FlightServiceTest {
         String departureDate = "2023-07-12";
         SearchFlightsRequest request = new SearchFlightsRequest(from, to, departureDate);
 
-        Mockito.when(flightRepository.listFlights()).thenReturn(flights);
+        Mockito.when(flightInMemoryRepository.listFlights()).thenReturn(flights);
 
-        PageResult<Flight> result = flightService.searchFlights(request);
+        PageResult<Flight> result = flightInMemoryService.searchFlights(request);
 
-        Mockito.verify(flightRepository, Mockito.times(1)).listFlights();
+        Mockito.verify(flightInMemoryRepository, Mockito.times(1)).listFlights();
 
         Assertions.assertEquals(2, result.getTotalItems());
         Assertions.assertEquals(flights, result.getItems());
@@ -52,23 +52,23 @@ class FlightServiceTest {
     void testSearchFlightsWithSameAirports() {
         SearchFlightsRequest request = new SearchFlightsRequest("RIX", "RIX", "2023-07-12 12:00");
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> flightService.searchFlights(request), "Departure and arrival airport are the same!");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> flightInMemoryService.searchFlights(request), "Departure and arrival airport are the same!");
     }
 
     @Test
     void testFetchFlights() {
-        Mockito.when(flightRepository.listFlights()).thenReturn(flights);
+        Mockito.when(flightInMemoryRepository.listFlights()).thenReturn(flights);
 
-        Flight result = flightService.fetchFlight(1);
+        Flight result = flightInMemoryService.fetchFlight(1);
 
-        Mockito.verify(flightRepository, Mockito.times(1)).listFlights();
+        Mockito.verify(flightInMemoryRepository, Mockito.times(1)).listFlights();
         Assertions.assertEquals(flights.get(0), result);
     }
 
     @Test
     void testFetchFlightsNotFound() {
-        Mockito.when(flightRepository.listFlights()).thenReturn(flights);
+        Mockito.when(flightInMemoryRepository.listFlights()).thenReturn(flights);
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> flightService.fetchFlight(3), "Failed to fetch flight!");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> flightInMemoryService.fetchFlight(3), "Failed to fetch flight!");
     }
 }
