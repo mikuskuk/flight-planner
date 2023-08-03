@@ -8,7 +8,6 @@ import io.codelex.flightplanner.request.AddFlightRequest;
 import io.codelex.flightplanner.request.PageResult;
 import io.codelex.flightplanner.request.SearchFlightsRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
@@ -16,13 +15,11 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class FlightDatabaseService implements FlightService {
 
-    private FlightRepository flightRepository;
-    private AirportRepository airportRepository;
+    private final FlightRepository flightRepository;
+    private final AirportRepository airportRepository;
 
     public FlightDatabaseService(FlightRepository flightRepository, AirportRepository airportRepository) {
         this.flightRepository = flightRepository;
@@ -90,7 +87,7 @@ public class FlightDatabaseService implements FlightService {
 
     @Override
     public List<Airport> searchAirport(String search) {
-        return airportRepository.findAirportByCriteria(search.toLowerCase().trim());
+        return flightRepository.findAirportByCriteria(search.toLowerCase().trim());
     }
 
     @Override
