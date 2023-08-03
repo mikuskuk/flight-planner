@@ -12,10 +12,10 @@ public class Flight {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "airport_from", referencedColumnName = "airport")
     private Airport from;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "airport_to", referencedColumnName = "airport")
     private Airport to;
     private String carrier;

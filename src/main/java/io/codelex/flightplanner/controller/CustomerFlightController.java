@@ -4,7 +4,6 @@ import io.codelex.flightplanner.domain.Airport;
 import io.codelex.flightplanner.domain.Flight;
 import io.codelex.flightplanner.request.PageResult;
 import io.codelex.flightplanner.request.SearchFlightsRequest;
-import io.codelex.flightplanner.service.FlightInMemoryService;
 import io.codelex.flightplanner.service.FlightService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

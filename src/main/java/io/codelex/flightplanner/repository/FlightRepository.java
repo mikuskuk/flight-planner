@@ -1,5 +1,6 @@
 package io.codelex.flightplanner.repository;
 
+import io.codelex.flightplanner.domain.Airport;
 import io.codelex.flightplanner.domain.Flight;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -23,4 +24,8 @@ public interface FlightRepository extends JpaRepository<Flight, Long> {
             "AND f.departureTime <= :departureEndTime ")
     List<Flight> searchFlight(String from, String to, LocalDateTime departureStartTime, LocalDateTime departureEndTime);
 
+    @Query("SELECT DISTINCT f.from FROM Flight f WHERE LOWER(f.from.airport) LIKE %:search%" +
+            "OR LOWER(f.from.city) LIKE %:search%" +
+            "OR LOWER(f.from.country) LIKE %:search%")
+    List<Airport> findAirportByCriteria(String search);
 }
