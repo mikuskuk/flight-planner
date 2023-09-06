@@ -28,7 +28,22 @@ public class FlightDatabaseService implements FlightService {
 
     @Override
     public Flight addFlight(AddFlightRequest request) {
+        validateAirports(request);
 
+        LocalDateTime departureTime = request.getDepartureTime();
+        LocalDateTime arrivalTime = request.getArrivalTime();
+        validateDepartureArrivalTime(departureTime, arrivalTime);
+
+        validateUniqueFlight(request);
+
+        Flight flight = new Flight(request.getFrom(), request.getTo(), request.getCarrier(), departureTime, arrivalTime);
+        airportRepository.save(flight.getFrom());
+        airportRepository.save(flight.getTo());
+
+        return flightRepository.save(flight);
+    }
+
+    private void validateAirports(AddFlightRequest request) {
         String departureAirport = request.getFrom().getAirport().trim();
         String arrivalAirport = request.getTo().getAirport().trim();
         String departureCity = request.getFrom().getCity().trim();
@@ -37,40 +52,30 @@ public class FlightDatabaseService implements FlightService {
         String arrivalCountry = request.getTo().getCountry().trim();
 
         if (departureAirport.equalsIgnoreCase(arrivalAirport) &&
-                departureCity.equalsIgnoreCase(arrivalCity) &&
-                departureCountry.equalsIgnoreCase(arrivalCountry)) {
+        departureCity.equalsIgnoreCase(arrivalCity) &&
+        departureCountry.equalsIgnoreCase(arrivalCountry)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Departure and arrival airports are the same!");
         }
+    }
 
-        LocalDateTime departureTime = request.getDepartureTime();
-        LocalDateTime arrivalTime = request.getArrivalTime();
-
+    private void validateDepartureArrivalTime(LocalDateTime departureTime, LocalDateTime arrivalTime) {
         if (arrivalTime.isBefore(departureTime) || arrivalTime.isEqual(departureTime)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid departure and arrival time!");
         }
+    }
 
-        Airport from = request.getFrom();
-        Airport to = request.getTo();
-        String carrier = request.getCarrier();
-
+    private void validateUniqueFlight(AddFlightRequest request) {
         List<Flight> existingFlights = flightRepository.findFlightByCriteria(
-                from.getAirport(),
-                to.getAirport(),
-                carrier,
-                departureTime,
-                arrivalTime
+                request.getFrom().getAirport(),
+                request.getTo().getAirport(),
+                request.getCarrier(),
+                request.getDepartureTime(),
+                request.getArrivalTime()
         );
 
-        if(!existingFlights.isEmpty()) {
+        if (existingFlights.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "This flight already exists!");
         }
-
-        Flight flight = new Flight(from, to, carrier, departureTime, arrivalTime);
-
-        airportRepository.save(flight.getFrom());
-        airportRepository.save(flight.getTo());
-
-        return flightRepository.save(flight);
     }
 
     @Override
